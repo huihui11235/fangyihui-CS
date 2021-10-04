@@ -67,8 +67,7 @@ AddPolynomial(const Polynomial Poly1,
 	for ( i = PolySum->HighPower; i >= 0; i-- )
 		PolySum->CoeffArray[ i ] = Poly1->CoeffArray[ i]
 		                           + Poly2->CoeffArray[ i ];
-}
-//两个多项式相加的过程//
+}//两个多项式相加的过程//
 
 void
 MultPolynomial( const Polynomial Poly1,
@@ -84,8 +83,7 @@ MultPolynomial( const Polynomial Poly1,
 				PolyProd->CoeffArray[i + j] +=
 				    Poly1->CoeffArray[i] *
 				    Poly2->CoeffArray[j];
-}
-//两个多项式相乘的过程//
+}//两个多项式相乘的过程//
 
 void PrintPoly(const Polynomial Q) {
 	int i;
