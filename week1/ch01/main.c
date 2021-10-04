@@ -163,8 +163,6 @@ int main(void) {
 	show(l);
 	DeleteList(l);
 	show(l);
-	
-
 
 	return 0;
 }
