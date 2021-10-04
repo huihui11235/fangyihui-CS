@@ -87,7 +87,6 @@ MultPolynomial( const Polynomial Poly1,
 }
 //两个多项式相乘的过程//
 
-
 void PrintPoly(const Polynomial Q) {
 	int i;
 	for (i = Q->HighPower; i > 0; i--)
