@@ -1,170 +1,138 @@
-#include <stddef.h>
-#ifndef _List_H
-#include <stdio.h>
-#include <malloc.h>
+#ifndef _Cursor_H
 
-struct Node;
-
-typedef struct Node *PtrToNode;
+typedef int PtrToNode;
 typedef PtrToNode List;
 typedef PtrToNode Position;
+
 typedef int ElementType;
-List MakeEmpty( List L );
-int IsEmpty( List L);
-int IsLast( Position P, List L);
-Position Find(ElementType X, List L);
+
+void InitializeCursorSpace( void);
+
+List MakeEmpty( List L);
+int IsEmpty( const List L );
+int IsLast(const Position P, const List L);
+Position Find( ElementType X, const List L);
 void Delete( ElementType X, List L);
-Position FindPrevious( ElementType X, List L);
+Position FindPrevious( ElementType X, const List L);
 void Insert( ElementType X, List L, Position P);
 void DeleteList( List L);
-Position Header( List L );
-Position First( List L );
-Position Advance( Position P);
-ElementType Retrieve( Position P );
-#endif /*_List_H*/
-/*Place in the implementation file */
-//链表的声明类型//
+Position Header( const List L);
+Position First( const List L);
+Position Advance( const Position P );
+ElementType Retrieve( const Position P );
 
+#endif _Cursor_H
+
+/*Place in the implementationfile */
+
+#include <stdio.h>
+#include <stdlib.h>
+#define SpaceSize 100
 struct Node {
 	ElementType Element;
 	Position Next;
 };
+struct Node CursorSpace[ SpaceSize ];
+//链表游标实现的声明//
 
-/*Return true if L is empty */
-int
-IsEmpty( List L) {
-	return L->Next == NULL;
-
-}
-
-
-//测试当前位置是否是链表的末尾函数//
-/*Return true if P is the last position in list L*/
-/*Parameter L is unused in this implementation */
-int
-
-IsLast( Position P, List L) {
-	return P->Next == NULL;
-}
-
-//find例程//
-/*Return Position of X in L; NULL if not found*/
-Position
-
-Find( ElementType X, List L) {
+static Position
+CursorA1loc( void) {
 	Position P;
-	P = L->Next;
-	while (P != NULL && P->Element != X)
-		P = P->Next;
+	P = CursorSpace[ 0 ].Next;
+	CursorSpace[ 0 ].Next = CursorSpace[ P ].Next;
 	return P;
-
 }
-//列表的删除例程//
-/*Delete first occurrence of X from a list*/
-/*Assume use of a header node*/
+static void
+
+CursorFree( Position P) {
+	CursorSpace[ P ].Next = CursorSpace[ 0 ].Next;
+	CursorSpace[ 0 ].Next = P;
+}
+//CursorA1loc申请一个位置用来存放新数据和CursorFree释放p所指向的数据及其空间//
+
+/*Return true if L is empty*/
 void
+InitializeCursorSpace(void) {
+	int i;
+	for (i = 0; i < SpaceSize; i++)
+		CursorSpace[i].Next = i + 1;
+	CursorSpace[SpaceSize - 1].Next = 0;
+}
 
-Delete( ElementType X, List L) {
+//初始化//
+List MakeEmoty(List L) {
+	if (L != NULL)
+		DeleteList(L);
+	L = CorsorAlloc();
+	if (L == 0)
+		printf("Out of memory");
+	CursorSpace[L].Next = 0;
+	return L;
+}
+
+int
+IsEmpty( List L ) {
+	return CursorSpace[ L ].Next == 0;
+}
+//测试一个链表是否为空的函数——游标实现//
+/*Return true if P is the last position in list L */
+/* Parameter L is unused in this implementation */
+
+int
+IsLast( Position P, List L) {
+	return CursorSpace[ P ].Next == 0;
+}
+//测试 P是否是链表的末尾的函数——游标实现//
+
+/* Return Position of X in L; 0 if not found*/
+/* Uses a header node */
+Position
+Find( ElementType X, List L ) {
 	Position P;
-	Position Tmp;
+	P = CursorSpace[ L].Next;
+	while ( P && CursorSpace[ P ].Element != X)
+		P = CursorSpace[ P].Next;
+	return P;
+}
+//例程 Pind——游标实现//
 
+/* Delete first occurrence of X from a list */
+/* Assume use of a header node*/
+void
+Delete( ElementType X, List L) {
+	Position P, TmpCell;
 	P = FindPrevious(X, L);
-	if ( !IsLast( P, L)) { /* Assumption of header use*/
-		/* X is found;delete it */
-		Tmp = P->Next;
-		P->Next = Tmp->Next; /* Bypass deleted cell*/
-		free(Tmp);
+	if ( !IsLast( P, L)) { /* Assumption of header use */
+		/* X is found; delete it */
+		TmpCell = CursorSpace[ P ].Next;
+		CursorSpace[ P ].Next = CursorSpace[TmpCell].Next;
+		CursorFree( TmpCell);
 	}
 }
-/*If X is not found,then Next field of returned*/
-/*Position is NULL */
-/* Assumes a header*/
+//对链表进行删除操作的例程 Delete——游标实现//
 Position
 
 FindPrevious( ElementType X, List L) {
 	Position P;
 	P = L;
-	while ( P->Next != NULL && P->Next->Element != X)
-		P = P->Next;
+	while ( CursorSpace[P].Next && CursorSpace[CursorSpace[P].Next].Element != X)
+		P = CursorSpace[P].Next;
 	return P;
 
 }
-//Findprevious——与Delete一起使用的Find例程//
+
 /*Insert (after legal position P)*/
-/* Headerimplementation assumed*/
-/*arameter L is unused in this implementation */
+/*Header implementation assumed*/
+/*Parameter L is unused in this implementation*/
 void
-
 Insert( ElementType X, List L, Position P) {
-	Position Tmp;
-	Tmp = malloc( sizeof( struct Node ));
-	if ( Tmp == NULL )
-		printf("out of space!!!");
-	Tmp->Element = X;
-	Tmp->Next = P->Next;
-	P->Next = Tmp;
+
+	Position TmpCell;
+	TmpCell = CursorAlloc();
+	if (TmpCell == 0)
+		printf("Out of space!!!");
+	CursorSpace[TmpCell].Element = X;
+	CursorSpace[TmpCell].Next = CursorSpace[ P ].Next;
+	CursorSpace[ P ].Next = TmpCell;
 }
-//链表的插入例程//
-
-/* Correct DeleteList algorithm */
-void
-DeleteList( List L) {
-	Position P, Tmp;
-	P = L->Next; /* Header assumed*/
-	L->Next = NULL;
-	while ( P != NULL ) {
-
-		Tmp = P->Next;
-		free( P);
-		P = Tmp;
-	}
-}
-
-PtrToNode create( int n) { //创建一个链表
-	List Head, p, r;
-	Head = (List)malloc(sizeof(struct Node));
-	if (Head == NULL)
-		printf("内存分配不成功！\n");
-	else {
-		Head->Next = NULL;
-		r = Head;
-		for (int i = 0; i < n; i++) {
-			p = (List)malloc(sizeof(struct Node));
-			if (p == NULL)
-				printf("内存分配不成功！\n");
-			else {
-				p->Element = i + 1;
-				r->Next = p;
-				r = p;
-				printf("%4d", p->Element);
-			}
-
-		}
-		printf("\n");
-		r->Next = NULL;
-	}
-	return Head;
-}
-
-void show(List L) {
-	List p;
-	p = L->Next;
-	while (p != NULL) {
-		printf("%4d", p->Element);
-		p = p->Next;
-	}
-	printf("\n");
-}
-
-int main(void) {
-	List l;
-	l = create(10);
-	Delete( 4, l);
-	show(l);
-	DeleteList(l);
-	show(l);
-	
-
-
-	return 0;
-}
+//对链表进行插入操作的例程Ingert——游标实现//
