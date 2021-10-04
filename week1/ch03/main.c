@@ -118,7 +118,6 @@ FindPrevious( ElementType X, List L) {
 	while ( CursorSpace[P].Next && CursorSpace[CursorSpace[P].Next].Element != X)
 		P = CursorSpace[P].Next;
 	return P;
-
 }
 
 /*Insert (after legal position P)*/
