@@ -2,7 +2,8 @@
 #include<stdio.h>
 #include<malloc.h>
 #define FatalError( Str )   fprintf( stderr, "%s\n", Str ), exit( 1 )
-Queue CreatQueue()//创建空队列；
+
+Queue CreatQueue()；
 {
 	Queue Q = malloc(sizeof(struct queue));
 	if (Q == NULL)
@@ -27,22 +28,22 @@ Queue CreatQueue()//创建空队列；
 }
 
 
-
-int IsEmpty(Queue Q)//判断队列是否为空；
+//判断队列是否为空//
+int IsEmpty(Queue Q)；
 {
 	return Q->front == Q->rear;
 }
 
 
-
-int IsFull(Queue Q)//判断队列是否为满；
+//判断队列是否为满//
+int IsFull(Queue Q)；
 {
 	return Q->rear == Q->Capacity-1;
 }
 
 
-
-void MakeEmpty(Queue Q)//置空
+//置空//
+void MakeEmpty(Queue Q)
 {
 	Q->front = Q->rear = 0;
 	Q->size = 0;
@@ -61,8 +62,8 @@ void EnQueue(Queue Q, ElementType data)//入队
 }
 
 
-
-void DeQueue(Queue Q)//出队
+//出队//
+void DeQueue(Queue Q)
 {
 	if (IsEmpty(Q))
 	{
